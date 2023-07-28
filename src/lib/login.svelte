@@ -6,6 +6,7 @@
 		signInWithPopup,
 	} from 'firebase/auth';
 	import { user } from '$lib/stores.js'
+	import { goto } from '$app/navigation';
 
 	function login(provider: GoogleAuthProvider | GithubAuthProvider) {
 		signInWithPopup(auth, provider)
@@ -20,10 +21,10 @@
 					// token.set(credential.accessToken);
 					user.set(result.user);
 				}
-				
+			goto('/overview');
 			})
-			.catch(() => {
-				return null;
+			.catch((error) => {
+				console.error(error);
 			});
 	}
 </script>
