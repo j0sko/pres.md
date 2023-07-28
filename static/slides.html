@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Title</title>
+		<meta charset="utf-8" />
+	</head>
+	<style id="style"></style>
+	<body>
+		<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+		<script defer>
+			console.warn('b');
+			// apply styles
+			const css = window.style;
+			const style = document.getElementById('style');
+			style.textContent = css;
+			// apply content
+			const content = window.content != undefined ? window.content : 'Hello';
+			console.log(content);
+			let slideshow = remark.create({
+				source: content,
+			});
+		</script>
+	</body>
+</html>
