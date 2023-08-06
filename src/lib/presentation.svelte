@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { getDoc, type QueryDocumentSnapshot } from 'firebase/firestore/lite';
 
 	export let content: QueryDocumentSnapshot;
-	const presContent = content.data().content;
+	const data = content.data();
 	const styleRef = content.data().style;
     let state: 'Loading' | 'Idle' | 'Error' = 'Idle';
 	function openPres() {
@@ -12,7 +13,7 @@
 				const css = (<any>doc).data().value;
 				const pres = window.open('/slides.html');
 				if (pres) {
-					(<any>pres).content = presContent;
+					(<any>pres).content = data.content;
 					(<any>pres).style = css;
 				}
                 state = 'Idle';
@@ -22,7 +23,8 @@
 		});
 	}
 </script>
-
+<div>
+<button on:click={() => {goto(`/editor/presentation/${content.id}`)}}>edit</button>
 <button on:click={openPres}>
     {#if state == 'Idle'}
     {content.data().name}
@@ -32,3 +34,4 @@
         Error
     {/if}
 </button>
+</div>

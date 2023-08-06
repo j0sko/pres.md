@@ -1,6 +1,16 @@
-import { addDoc, collection, doc } from "firebase/firestore/lite";
+import { DocumentReference, FieldValue, addDoc, collection, serverTimestamp } from "firebase/firestore/lite";
 import { db } from "./firebase";
-export async function addPres(user: object, content: string, name: string) {
-   await addDoc(collection(db, `users/${(<any>user).uid}/presentations`), {'content': content, 'name': name})
-   //TODO: make user work
+import type { User } from "firebase/auth";
+
+type Pres = {
+    content: string,
+    style: DocumentReference,
+    name: string,
+}
+
+export function addPres(user: User, pres: Pres) {
+    addDoc(collection(db, `users/${user.uid}/presentations`), {
+        ...pres,
+        edited:  serverTimestamp()
+    })
 }
