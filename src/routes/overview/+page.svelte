@@ -2,8 +2,9 @@
 	import { db } from '$lib/firebase';
 	import { user } from '$lib/stores';
 	import { getDocs, collection, QueryDocumentSnapshot } from 'firebase/firestore/lite';
-	import Presentation from '$lib/presentation.svelte';
+	import Presentation from '$lib/components/presentation.svelte';
 	import { goto } from '$app/navigation';
+	import Loading from '$lib/generic/loading.svelte';
 	let lines: QueryDocumentSnapshot[] = new Array();
 	const querySnapshot = getDocs(collection(db, 'users', $user.uid, 'presentations')).then(
 		(result) => {
@@ -14,11 +15,13 @@
 	);
 </script>
 
-<button on:click={() => goto('/editor/presentation/new')}>+</button>
-{#await querySnapshot}
-	waiting..
-{:then}
-	{#each lines as line}
-		<Presentation content={line} />
-	{/each}
-{/await}
+<main>
+	<button on:click={() => goto('/editor/presentation/new')}>+</button>
+	{#await querySnapshot}
+		<Loading />
+	{:then}
+		{#each lines as line}
+			<Presentation content={line} />
+		{/each}
+	{/await}
+</main>

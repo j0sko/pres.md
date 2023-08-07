@@ -1,33 +1,65 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
 	import { page } from '$app/stores';
-	import { doc, getDoc, updateDoc, collection} from 'firebase/firestore/lite';
+	import {
+		DocumentReference,
+		doc,
+		getDoc,
+		serverTimestamp,
+		updateDoc
+	} from 'firebase/firestore/lite';
 	import { db } from '$lib/firebase';
-	import { addPres } from '$lib/adder';
+	import { addPres, type Pres } from '$lib/generic/helper';
+	import { goto } from '$app/navigation';
+	import BtnAsync from '$lib/generic/btnAsync.svelte';
+	import { error } from '@sveltejs/kit';
 
 	const urlParam = $page.url.toString().split('/').pop();
 	let docRef = doc(db, `users/${$user.uid}/presentations/${urlParam}`);
 	let content: string;
 	let name: string;
-	function sendDoc() {
+
+	let docPromise = getDoc(docRef).then((r) => {
+		content = r.data()?.content ?? '';
+		name = r.data()?.name ?? 'Untitled';
+	});
+
+	let promise: Promise<any> | undefined;
+	async function sendDoc() {
 		if (urlParam == 'new') {
-			addPres($user, {name: name, content: content, style: doc(db, 'styles/default_light')})
+			return addPres($user, {
+				name: name,
+				content: content,
+				style: doc(db, 'styles/default_light')
+			});
+		} else {
+			return updateDoc(docRef, { content: content, name: name, edited: serverTimestamp() });
 		}
-		updateDoc(docRef, {content: content})
 	}
 </script>
-{#if urlParam == 'new'}
-<textarea contenteditable="true" bind:innerText={content} />
-<input type="text" bind:value={name} placeholder='Untitled'>
-{:else}
-	{#await getDoc(docRef)}
-	waiting
-	{:then docSnap}
-	<input type="text" bind:value={name} placeholder={docSnap.data()?.name ?? 'Untitled'}>
-	<textarea contenteditable="true" bind:innerText={content}>{docSnap.data()?.content ?? ''}</textarea>
-	{:catch}
-	error
-	{/await}
-{/if}
-<button on:click={sendDoc}>Save</button>
 
+<main>
+	{#if urlParam == 'new'}
+		<input type="text" bind:value={name} placeholder="Untitled" />
+		<textarea contenteditable="true" bind:value={content} />
+	{:else}
+		{#await docPromise}
+			waiting
+		{:then}
+			<input type="text" bind:value={name} placeholder={name} />
+			<textarea contenteditable="true" bind:value={content} />
+		{:catch}
+			error
+		{/await}
+	{/if}
+	<BtnAsync
+		on:click={() => {
+			promise = sendDoc();
+		}}
+		on:finish={(r) => {
+			console.log(r);
+			goto('/overview');
+		}}
+		{promise}>Save</BtnAsync
+	>
+</main>

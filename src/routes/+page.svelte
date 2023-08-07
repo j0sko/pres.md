@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Login from '$lib/login.svelte';
+	import Login from '$lib/components/login.svelte';
 </script>
 
-<body>
+<main>
 	<Login />
-</body>
+</main>
