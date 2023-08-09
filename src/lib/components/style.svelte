@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { updateDoc, type QueryDocumentSnapshot } from 'firebase/firestore/lite';
   import { goto } from '$app/navigation';
-	import { windowContext } from '$lib/stores';
+	import { windowContext, moving } from '$lib/stores';
 	import Loading from '$lib/generic/loading.svelte';
 
 	export let content: QueryDocumentSnapshot; 
@@ -10,6 +10,7 @@
   
   // go to editor for this style
 function edit() {
+    moving.set(true);
   windowContext.set(content);
   goto('/editor/styles');
 }
@@ -24,7 +25,7 @@ async function setStyle() {
 }
 </script>
 
-  <div>
+		<div>
     <!-- show preview if available -->
       {#if typeof(preview) != 'undefined'}
         <div class="preview" style={preview.background}>
@@ -38,7 +39,7 @@ async function setStyle() {
     {/if}
       <p>{data.name}</p>
       <button on:click={edit}>Edit</button> 
-    {#if $windowContext != null}
+    {#if $windowContext != null && !$moving}
       <button on:click={setStyle}>Set style</button>
     {#if typeof(promise) != 'undefined'}
     {#await promise}
@@ -50,4 +51,4 @@ async function setStyle() {
     {/await}
     {/if}
     {/if}
-  </div>
+		</div>

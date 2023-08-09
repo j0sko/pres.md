@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user, windowContext } from '$lib/stores';
+	import { user, windowContext, moving } from '$lib/stores';
 	import {
 	deleteDoc,
 		doc,
@@ -29,6 +29,7 @@
 	}
 
   function pickStyle() {
+    moving.set(false);
     goto('/styles')
   }
 

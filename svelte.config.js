@@ -16,7 +16,8 @@ const config = {
 			mode: 'auto',
 			directives: {
 			}
-		}
+		},
+
 }};
 
 export default config;
