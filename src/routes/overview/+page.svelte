@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { db } from '$lib/firebase';
-	import { user } from '$lib/stores';
+	import { user, windowContext } from '$lib/stores';
 	import { getDocs, collection, QueryDocumentSnapshot } from 'firebase/firestore/lite';
 	import Presentation from '$lib/components/presentation.svelte';
 	import { goto } from '$app/navigation';
@@ -16,7 +16,10 @@
 </script>
 
 <main>
-	<button on:click={() => goto('/editor/presentation/new')}>+</button>
+	<button on:click={() => {
+  windowContext.set(null);
+  goto('/editor/presentation');
+  }}>+</button>
 	{#await querySnapshot}
 		<Loading />
 	{:then}

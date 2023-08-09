@@ -1,19 +1,17 @@
 <script lang="ts">
-	import { updateDoc, type QueryDocumentSnapshot } from 'firebase/firestore/lite';
+	import { updateDoc, type QueryDocumentSnapshot} from 'firebase/firestore/lite';
   import { goto } from '$app/navigation';
 	import { windowContext } from '$lib/stores';
 	import Loading from '$lib/generic/loading.svelte';
 
-	export let content: QueryDocumentSnapshot; 
+	export let content: QueryDocumentSnapshot;
   const data = content.data();
-  const preview = data.preview;
-  
-  // go to editor for this style
+
 function edit() {
   windowContext.set(content);
-  goto(`/editor/styles/${content.id}`);
+  goto(`/editor/styles/${content.id}`)
 }
-  // set the style to the presentation defined in windowContext
+    
 let promise: Promise<void> | undefined;
 function setStyle() {
     if ($windowContext != null) {
@@ -24,20 +22,8 @@ function setStyle() {
 }
 </script>
 
-		<div>
-  <!-- show preview if available -->
-  {#if typeof(preview) != 'undefined'}
-			<div class="preview" style={preview.background}>
-        <div class='slide' style={preview.slide}>
-				<h2 style={preview.title}>Title</h2>
-				<p style={preview.text}>Lorem ipsum dolor sit</p>
-        </div>
-			</div>
-  {:else}
-    <p>Error</p>
-  {/if}
-
-			<p>{data.name}</p>
+<div>
+  <p>{data.name}</p>
  <button on:click={edit}>Edit</button> 
   {#if $windowContext != null}
   {#await promise}
@@ -49,4 +35,4 @@ function setStyle() {
   {/await}
   <button on:click={setStyle}>Set style</button>
   {/if}
-		</div>
+</div>

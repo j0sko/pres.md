@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { getDoc, type QueryDocumentSnapshot } from 'firebase/firestore/lite';
 	import Loading from '../generic/loading.svelte';
-
+  import { windowContext } from '$lib/stores';
 	export let content: QueryDocumentSnapshot;
 	const data = content.data();
 	const styleRef = data.style;
@@ -11,7 +11,7 @@
 	async function openPres() {
 		getDoc(styleRef).then((doc) => {
 			if (doc.exists()) {
-				const css = (<any>doc).data().value;
+				const css = (<any>doc).data()?.value ?? '';
 				const pres = window.open('/slides.html');
 				if (pres) {
 					(<any>pres).content = data.content;
@@ -28,7 +28,8 @@
 <div>
 	<button
 		on:click={() => {
-			goto(`/editor/presentation/${content.id}`);
+      windowContext.set(content);      
+			goto('/editor/presentation');
 		}}>edit</button
 	>
 	<button on:click={openPres}>
