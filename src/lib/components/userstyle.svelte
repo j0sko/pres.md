@@ -9,11 +9,11 @@
 
 function edit() {
   windowContext.set(content);
-  goto(`/editor/styles/${content.id}`)
+  goto('/editor/styles')
 }
     
 let promise: Promise<void> | undefined;
-function setStyle() {
+async function setStyle() {
     if ($windowContext != null) {
    promise = updateDoc($windowContext?.ref, {style: content.ref})
     .then(() => {
@@ -26,6 +26,7 @@ function setStyle() {
   <p>{data.name}</p>
  <button on:click={edit}>Edit</button> 
   {#if $windowContext != null}
+  {#if typeof(promise) != 'undefined'}
   {#await promise}
   <Loading />
   {:then}
@@ -33,6 +34,7 @@ function setStyle() {
   {:catch}
     Error
   {/await}
+  {/if}
   <button on:click={setStyle}>Set style</button>
   {/if}
 </div>

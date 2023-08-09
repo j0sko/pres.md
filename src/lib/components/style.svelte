@@ -11,11 +11,11 @@
   // go to editor for this style
 function edit() {
   windowContext.set(content);
-  goto(`/editor/styles/${content.id}`);
+  goto('/editor/styles');
 }
   // set the style to the presentation defined in windowContext
 let promise: Promise<void> | undefined;
-function setStyle() {
+async function setStyle() {
     if ($windowContext != null) {
    promise = updateDoc($windowContext?.ref, {style: content.ref})
     .then(() => {
@@ -24,29 +24,30 @@ function setStyle() {
 }
 </script>
 
-		<div>
-  <!-- show preview if available -->
-  {#if typeof(preview) != 'undefined'}
-			<div class="preview" style={preview.background}>
-        <div class='slide' style={preview.slide}>
-				<h2 style={preview.title}>Title</h2>
-				<p style={preview.text}>Lorem ipsum dolor sit</p>
+  <div>
+    <!-- show preview if available -->
+      {#if typeof(preview) != 'undefined'}
+        <div class="preview" style={preview.background}>
+          <div class='slide' style={preview.slide}>
+          <h2 style={preview.title}>Title</h2>
+          <p style={preview.text}>Lorem ipsum dolor sit</p>
+          </div>
         </div>
-			</div>
-  {:else}
-    <p>Error</p>
-  {/if}
-
-			<p>{data.name}</p>
- <button on:click={edit}>Edit</button> 
-  {#if $windowContext != null}
-  {#await promise}
-  <Loading />
-  {:then}
-    Success!
-  {:catch}
-    Error
-  {/await}
-  <button on:click={setStyle}>Set style</button>
-  {/if}
-		</div>
+    {:else}
+      <p>Error</p>
+    {/if}
+      <p>{data.name}</p>
+      <button on:click={edit}>Edit</button> 
+    {#if $windowContext != null}
+      <button on:click={setStyle}>Set style</button>
+    {#if typeof(promise) != 'undefined'}
+    {#await promise}
+      <Loading />
+    {:then}
+      Success!
+    {:catch}
+      Error
+    {/await}
+    {/if}
+    {/if}
+  </div>

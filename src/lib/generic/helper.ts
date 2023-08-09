@@ -2,10 +2,15 @@ import { DocumentReference, FieldValue, addDoc, collection, serverTimestamp } fr
 import { db } from "../firebase";
 import type { User } from "firebase/auth";
 
-export type Pres = {
+type Pres = {
     content: string,
     style: DocumentReference,
     name: string
+}
+
+type Style = {
+  name: string,
+  value: string
 }
 
 export async function addPres(user: User, pres: Pres) {
@@ -13,4 +18,8 @@ export async function addPres(user: User, pres: Pres) {
         ...pres,
         edited:  serverTimestamp()
     })
+}
+
+export async function addStyle(user: User, style: Style) {
+  return addDoc(collection(db, `users/${user.uid}/styles`), style)
 }

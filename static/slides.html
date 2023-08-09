@@ -13,7 +13,7 @@
 			const style = document.getElementById('style');
 			style.textContent = css;
 			// apply content
-			const content = window.content != undefined ? window.content : 'Hello';
+			const content = window.content != undefined ? window.content : '';
 			console.log(content);
 			let slideshow = remark.create({
 				source: content,
