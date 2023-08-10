@@ -13,10 +13,9 @@
   
   let name = $windowContext?.data()?.name ?? 'Untitled';
   let value = $windowContext?.data()?.value ?? '';
-  const path = $windowContext?.ref.path ?? '';
-  const editable: Boolean = path.includes('users');
-
-  // the editor
+  const path = $windowContext?.ref.path ?? 'new';
+  // set editable if it is user style or new
+  const editable: Boolean = path.includes('users') || path == 'new';
 
   //the code for the preview
   let iframe:HTMLIFrameElement | undefined;

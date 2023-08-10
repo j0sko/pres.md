@@ -5,8 +5,10 @@
 	import Presentation from '$lib/components/presentation.svelte';
 	import { goto } from '$app/navigation';
 	import Loading from '$lib/generic/loading.svelte';
+  
 	let lines: QueryDocumentSnapshot[] = new Array();
-	const querySnapshot = getDocs(collection(db, 'users', $user.uid, 'presentations')).then(
+  const ref =  collection(db, 'users', $user.uid, 'presentations');
+	const querySnapshot = getDocs(ref).then(
 		(result) => {
 			result.forEach((doc) => {
 				lines.push(doc);

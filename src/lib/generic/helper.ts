@@ -1,25 +1,30 @@
-import { DocumentReference, FieldValue, addDoc, collection, serverTimestamp } from "firebase/firestore/lite";
+import { DocumentReference,  addDoc, collection, serverTimestamp } from "firebase/firestore/lite";
 import { db } from "../firebase";
 import type { User } from "firebase/auth";
 
-type Pres = {
+export type Pres = {
     content: string,
     style: DocumentReference,
     name: string
 }
 
-type Style = {
+export type Style = {
   name: string,
   value: string
 }
 
-export async function addPres(user: User, pres: Pres) {
+export interface Placeholder {
+  uid: string,
+  placeholder: boolean,
+}
+
+export async function addPres(user: User | Placeholder, pres: Pres) {
     return addDoc(collection(db, `users/${user.uid}/presentations`), {
         ...pres,
         edited:  serverTimestamp()
     })
 }
 
-export async function addStyle(user: User, style: Style) {
+export async function addStyle(user: User | Placeholder, style: Style) {
   return addDoc(collection(db, `users/${user.uid}/styles`), style)
 }

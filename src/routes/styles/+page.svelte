@@ -5,6 +5,7 @@
 	import Loading from '$lib/generic/loading.svelte';
 	import { user } from '$lib/stores';
 	import { QueryDocumentSnapshot, collection, getDocs } from 'firebase/firestore/lite';
+  import { goto } from '$app/navigation';
 
 	let defaultStyles: QueryDocumentSnapshot[] = new Array();
 	const defaultsSnapshot = getDocs(collection(db, 'styles'))
@@ -22,9 +23,16 @@
 		.catch((e) => {
 			console.error(e);
 		});
+
+  // logic for switching styles from user styles and default ones
+  let userstyles = false;
+  
 </script>
 
 <main>
+  <button on:click={() => goto('/editor/styles')}>+</button>
+  <button on:click={() => {userstyles = !userstyles}}>{!userstyles ? 'Your' : 'System'} styles</button>
+  {#if !userstyles}
 	<div>
 		{#await defaultsSnapshot}
 			<Loading />
@@ -34,6 +42,7 @@
 			{/each}
 		{/await}
 	</div>
+  {:else}
   <div>
     {#await userSnapshot}
       <Loading />
@@ -44,4 +53,5 @@
       
     {/await}   
   </div>
+  {/if}
 </main>

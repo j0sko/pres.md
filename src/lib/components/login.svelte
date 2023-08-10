@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { githubProvider, googleProvider, auth } from '$lib/firebase.js';
+	import { githubProvider, googleProvider, auth, db } from '$lib/firebase.js';
 	import {
 		GithubAuthProvider,
 		GoogleAuthProvider,
@@ -7,21 +7,21 @@
 	} from 'firebase/auth';
 	import { user } from '$lib/stores.js'
 	import { goto } from '$app/navigation';
+	import { doc, getDoc, setDoc } from 'firebase/firestore/lite';
 
-	function login(provider: GoogleAuthProvider | GithubAuthProvider) {
+	async function login(provider: GoogleAuthProvider | GithubAuthProvider) {
 		signInWithPopup(auth, provider)
 			.then((result) => {
-				if (provider instanceof GoogleAuthProvider) {
-					const credential = GoogleAuthProvider.credentialFromResult(result);
 					// token.set(credential.accessToken);
 					user.set(result.user);
-					
-				} else if (provider instanceof GithubAuthProvider) {
-					const credential = GithubAuthProvider.credentialFromResult(result);
-					// token.set(credential.accessToken);
-					user.set(result.user);
-				}
-			goto('/overview');
+        const docRef = doc(db, 'users', result.user.uid);
+        getDoc(docRef).then((r) => {
+          if (r.exists()) {
+            goto('/overview');
+          } else {
+            setDoc(docRef, {used: 0}).then(() => goto('/overview'));
+          }
+        })
 			})
 			.catch((error) => {
 				console.error(error);
