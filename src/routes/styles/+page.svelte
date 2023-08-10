@@ -13,17 +13,15 @@
 	const defaultsSnapshot = getDocs(defaultQuery)
 		.then((r) => {
 			r.forEach((doc) => {defaultStyles = [...defaultStyles, doc]});
-      defaultsMaxPage = Math.max(1, Math.ceil(defaultStyles.length / 10));
 		})
 		.catch((e) => {
 			console.error(e);
 		});
 	let userStyles: QueryDocumentSnapshot[] = new Array();
-  const userQuery = query(collection(db, `users/${$user.uid}/styles`), orderBy('edited', 'desc'));
+  const userQuery = query(collection(db, `users/${$user.uid}/styles`), orderBy('name'));
 	const userSnapshot = getDocs(userQuery)
 		.then((r) => {
-			r.forEach((doc) => {userStyles = [...userStyles, doc]});
-      userMaxPage = Math.max(1, Math.ceil(userStyles.length / 10));
+			r.forEach((doc) => {userStyles = [...userStyles, doc];console.log(doc.data().name)});
 		})
 		.catch((e) => {
 			console.error(e);
@@ -33,18 +31,13 @@
   let userstyles = false;
   
   // page changing logic
-  let defaultsMaxPage = 1;
-  let userMaxPage = 1;
-
   let page = 1;
 
   //search logic
   let search = '';
-  let defaultStylesAfterSearch:any[];
-  $: defaultStylesAfterSearch = defaultStyles.filter((x) => x.data().name.toLowerCase().includes(search.toLowerCase()));
+  $: maxPage = Math.max(1, Math.ceil((userstyles ? userStyles : defaultStyles).length / 10));
+  $: linesAfterSearch = (userstyles ? userStyles : defaultStyles).filter((x) => x.data().name.toLowerCase().includes(search.toLowerCase()));
 
-  let userStylesAfterSearch:any[];
-  $: userStylesAfterSearch = userStyles.filter((x) => x.data().name.toLowerCase().includes(search.toLowerCase()));
 </script>
 
 <main>
@@ -59,7 +52,7 @@
 		{#await defaultsSnapshot}
 			<Loading />
 		{:then}
-			{#each defaultStylesAfterSearch.slice((page - 1)*10,page*10-1) as content}
+			{#each linesAfterSearch.slice((page - 1)*10,page*10-1) as content}
 				<Preview {content} />
 			{/each}
 		{/await}
@@ -69,12 +62,11 @@
     {#await userSnapshot}
       <Loading />
       {:then}
-      {#each userStylesAfterSearch.slice((page - 1)*10,page*10-1) as content}
+      {#each linesAfterSearch.slice((page - 1)*10,page*10-1) as content}
         <Userstyle {content} />
       {/each}
-      
     {/await}   
   </div>
   {/if}
-    <PageSelector bind:page={page} maxPage={userstyles ? userMaxPage : defaultsMaxPage}/>
+    <PageSelector bind:page={page} {maxPage}/>
 </main>

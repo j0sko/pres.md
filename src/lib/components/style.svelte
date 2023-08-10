@@ -5,8 +5,8 @@
 	import Loading from '$lib/generic/loading.svelte';
 
 	export let content: QueryDocumentSnapshot; 
-  const data = content.data();
-  const preview = data.preview;
+  $: data = content.data();
+  $: preview = data.preview;
   
   // go to editor for this style
 function edit() {

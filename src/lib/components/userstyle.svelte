@@ -5,7 +5,7 @@
 	import Loading from '$lib/generic/loading.svelte';
 
 	export let content: QueryDocumentSnapshot;
-  const data = content.data();
+  $: data = content.data();
 
 function edit() {
     moving.set(true);
