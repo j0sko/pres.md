@@ -26,5 +26,8 @@ export async function addPres(user: User | Placeholder, pres: Pres) {
 }
 
 export async function addStyle(user: User | Placeholder, style: Style) {
-  return addDoc(collection(db, `users/${user.uid}/styles`), style)
+  return addDoc(collection(db, `users/${user.uid}/styles`), {
+    ...style,
+    edited: serverTimestamp()
+  })
 }

@@ -4,24 +4,26 @@
 	import { db } from '$lib/firebase';
 	import Loading from '$lib/generic/loading.svelte';
 	import { user } from '$lib/stores';
-	import { QueryDocumentSnapshot, collection, getDocs } from 'firebase/firestore/lite';
+	import { QueryDocumentSnapshot, collection, getDocs, query, orderBy } from 'firebase/firestore/lite';
   import { goto } from '$app/navigation';
 	import PageSelector from '$lib/generic/pageSelector.svelte';
 
 	let defaultStyles: QueryDocumentSnapshot[] = new Array();
-	const defaultsSnapshot = getDocs(collection(db, 'styles'))
+  const defaultQuery = query(collection(db, 'styles'), orderBy('name'));
+	const defaultsSnapshot = getDocs(defaultQuery)
 		.then((r) => {
-			r.forEach((doc) => defaultStyles.push(doc));
-      defaultsMaxPage = Math.ceil(defaultStyles.length / 10);
+			r.forEach((doc) => {defaultStyles = [...defaultStyles, doc]});
+      defaultsMaxPage = Math.max(1, Math.ceil(defaultStyles.length / 10));
 		})
 		.catch((e) => {
 			console.error(e);
 		});
 	let userStyles: QueryDocumentSnapshot[] = new Array();
-	const userSnapshot = getDocs(collection(db, `users/${$user.uid}/styles`))
+  const userQuery = query(collection(db, `users/${$user.uid}/styles`), orderBy('edited', 'desc'));
+	const userSnapshot = getDocs(userQuery)
 		.then((r) => {
-			r.forEach((doc) => userStyles.push(doc));
-      userMaxPage = Math.ceil(userStyles.length / 10);
+			r.forEach((doc) => {userStyles = [...userStyles, doc]});
+      userMaxPage = Math.max(1, Math.ceil(userStyles.length / 10));
 		})
 		.catch((e) => {
 			console.error(e);
@@ -35,9 +37,18 @@
   let userMaxPage = 1;
 
   let page = 1;
+
+  //search logic
+  let search = '';
+  let defaultStylesAfterSearch:any[];
+  $: defaultStylesAfterSearch = defaultStyles.filter((x) => x.data().name.toLowerCase().includes(search.toLowerCase()));
+
+  let userStylesAfterSearch:any[];
+  $: userStylesAfterSearch = userStyles.filter((x) => x.data().name.toLowerCase().includes(search.toLowerCase()));
 </script>
 
 <main>
+  <input type="text" placeholder="search..." bind:value={search} />
   <button on:click={() => goto('/editor/styles')}>+</button>
   <button on:click={() => {
     userstyles = !userstyles;
@@ -48,7 +59,7 @@
 		{#await defaultsSnapshot}
 			<Loading />
 		{:then}
-			{#each defaultStyles.slice((page - 1)*10,page*10) as content}
+			{#each defaultStylesAfterSearch.slice((page - 1)*10,page*10-1) as content}
 				<Preview {content} />
 			{/each}
 		{/await}
@@ -58,7 +69,7 @@
     {#await userSnapshot}
       <Loading />
       {:then}
-      {#each userStyles.slice((page - 1)*10,page*10) as content}
+      {#each userStylesAfterSearch.slice((page - 1)*10,page*10-1) as content}
         <Userstyle {content} />
       {/each}
       

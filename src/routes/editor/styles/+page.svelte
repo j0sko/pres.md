@@ -77,7 +77,7 @@
     ></iframe>
 
   <!-- delete style if it is not default -->
-  {#if editable}
+  {#if editable && $windowContext}
 <BtnAsync
     on:click={() => {
       deletePromise = deleteStyle();

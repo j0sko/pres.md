@@ -51,6 +51,8 @@
 		<textarea contenteditable="true" bind:value={content} />
     <button on:click={pickStyle}>Pick a style</button>
 
+  {#if $windowContext}
+    
 <BtnAsync
     on:click={() => {
       deletePromise = deletePres();
@@ -60,6 +62,7 @@
     }}
     promise={deletePromise}
     >Delete presentation</BtnAsync>
+  {/if}
 
 	<BtnAsync
 		on:click={() => {
